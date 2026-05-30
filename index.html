@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>برنامج الافتقاد - كنيسة مارجرجس بالسويس</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#1e3a8a', 
+                        secondary: '#3b82f6',
+                        accent: '#10b981', 
+                        uni: '#8b5cf6', 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; height: 100dvh; }
+        
+        .toggle-checkbox:checked { right: 0; border-color: #10b981; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
+        .toggle-checkbox { right: 0; z-index: 1; border-color: #e5e7eb; transition: all 0.3s; }
+        .toggle-label { width: 3rem; background-color: #e5e7eb; transition: all 0.3s; }
+        
+        .hide { display: none !important; }
+
+        .nav-square { transition: all 0.3s ease; }
+        .nav-square.active {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5);
+            transform: translateY(-2px);
+        }
+        .nav-square.active-uni {
+            background: linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+        .nav-square.active-kg {
+            background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.5);
+            transform: translateY(-2px);
+        }
+        .nav-square:not(.active):not(.active-uni):not(.active-kg):hover {
+            background-color: #eff6ff;
+            transform: translateY(-2px);
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .star-rating i { cursor: pointer; transition: color 0.2s; }
+        .star-rating i.active { color: #f59e0b; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased flex flex-col overflow-hidden relative">
+
+    <div id="loginScreen" class="fixed inset-0 bg-primary bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] flex items-center justify-center z-50 p-4 transition-opacity duration-300">
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-3xl text-center border-t-8 border-secondary overflow-y-auto max-h-[95dvh] custom-scrollbar relative transition-all duration-300">
+            
+            <div class="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow-lg mt-2">
+                <i class="fa-solid fa-church text-3xl text-primary"></i>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-black mb-1 text-primary">برنامج الافتقاد</h1>
+            <h2 class="text-base md:text-lg font-bold mb-8 text-gray-500">كنيسة مارجرجس بالسويس</h2>
+            
+            <div id="stepSelectStage" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                <button onclick="window.selectStage('nursery')" class="group relative bg-white border-2 border-emerald-100 hover:border-emerald-400 p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center gap-4 transform hover:-translate-y-1 overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="bg-emerald-100 text-emerald-600 w-20 h-20 rounded-2xl flex items-center justify-center text-4xl shadow-inner z-10">
+                        <i class="fa-solid fa-baby"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-gray-800 z-10">حضانه</h3>
+                </button>
+
+                <button onclick="window.selectStage('primary')" class="group relative bg-white border-2 border-blue-100 hover:border-blue-400 p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center gap-4 transform hover:-translate-y-1 overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="bg-blue-100 text-blue-600 w-20 h-20 rounded-2xl flex items-center justify-center text-4xl shadow-inner z-10">
+                        <i class="fa-solid fa-child"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-gray-800 z-10">ابتدائى</h3>
+                </button>
+
+                <button onclick="window.selectStage('prep')" class="group relative bg-white border-2 border-purple-100 hover:border-purple-400 p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center gap-4 transform hover:-translate-y-1 overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="bg-purple-100 text-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center text-4xl shadow-inner z-10">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-gray-800 z-10">اعدادى</h3>
+                </button>
+            </div>
+
+            <div id="stepSelectSubStage" class="hide flex flex-col gap-4 max-w-xl mx-auto">
+                <h3 id="subStageTitle" class="text-xl font-black text-gray-700 mb-2"></h3>
+                <div id="subStageButtons" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
+                <button onclick="window.backToStages()" class="w-full mt-4 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition-all duration-300">
+                    رجوع للمراحل الرئيسية
+                </button>
+            </div>
+
+            <div id="stepPassword" class="hide max-w-sm mx-auto animate-fade-in">
+                <div id="loginMeetingIcon" class="text-5xl mb-4"></div>
+                <h3 id="loginMeetingTitle" class="text-2xl font-black text-gray-800 mb-6"></h3>
+                
+                <div class="relative mb-6">
+                    <i class="fa-solid fa-lock absolute right-4 top-4 text-gray-400"></i>
+                    <input type="password" id="passwordInput" placeholder="أدخل الرقم السري" 
+                           class="w-full pr-12 pl-4 py-3 rounded-xl border-2 border-gray-200 focus:border-secondary focus:ring-4 focus:ring-blue-100 outline-none text-center text-xl tracking-widest transition">
+                </div>
+                
+                <div class="flex flex-col gap-3">
+                    <button onclick="window.checkPassword()" id="btnLogin" class="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 rounded-xl hover:shadow-lg transition-all duration-300 text-lg flex items-center justify-center gap-2">
+                        دخول <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <button onclick="window.backToSelection()" class="w-full bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition-all duration-300">
+                        رجوع للخلف
+                    </button>
+                </div>
+            </div>
+
+            <div id="stepSelectTargetType" class="hide flex flex-col gap-4 max-w-xl mx-auto animate-fade-in">
+                <h3 id="targetTypeTitle" class="text-2xl font-black text-gray-800 mb-2">تحديد واجهة العرض والافتقاد</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button onclick="window.setTargetType('servants')" class="group relative bg-white border-2 border-blue-100 hover:border-blue-500 p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center gap-4 transform hover:-translate-y-1">
+                        <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-inner">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-gray-800">خدام المرحلة</h4>
+                    </button>
+                    <button onclick="window.setTargetType('makhdooms')" class="group relative bg-white border-2 border-orange-100 hover:border-orange-500 p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-center gap-4 transform hover:-translate-y-1">
+                        <div class="bg-orange-100 text-orange-600 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-inner">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h4 class="text-xl font-black text-gray-800">مخدومين المرحلة</h4>
+                    </button>
+                </div>
+                <button onclick="window.backToPassword()" class="w-full mt-4 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition-all duration-300">
+                    رجوع للخلف
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ratingScreen" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-50 p-4 hide overflow-y-auto">
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-xl w-full max-w-md text-center border-t-8 border-yellow-400 my-auto">
+            <div class="bg-yellow-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
+                <i class="fa-solid fa-star text-4xl text-yellow-500"></i>
+            </div>
+            <h1 class="text-2xl font-black mb-2 text-gray-800">تقييم الخدمة</h1>
+            <p id="ratingMeetingName" class="text-sm font-bold text-gray-500 mb-6">كنيسة مارجرجس بالسويس</p>
+            
+            <div class="mb-6">
+                <label class="block text-lg font-bold text-gray-700 mb-3">ما هو تقييمك العام؟</label>
+                <div class="flex justify-center gap-2 text-3xl text-gray-300 star-rating" dir="ltr">
+                    <i class="fa-solid fa-star" onclick="window.setRating(1)"></i>
+                    <i class="fa-solid fa-star" onclick="window.setRating(2)"></i>
+                    <i class="fa-solid fa-star" onclick="window.setRating(3)"></i>
+                    <i class="fa-solid fa-star" onclick="window.setRating(4)"></i>
+                    <i class="fa-solid fa-star" onclick="window.setRating(5)"></i>
+                </div>
+            </div>
+
+            <div class="mb-6 text-right">
+                <label class="block text-sm font-bold text-gray-700 mb-2">اسمك (اختياري)</label>
+                <input type="text" id="feedbackName" placeholder="اكتب اسمك هنا..." class="w-full p-3 border-2 rounded-xl outline-none bg-gray-50 font-bold focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 transition">
+            </div>
+
+            <div class="mb-6 text-right">
+                <label class="block text-sm font-bold text-gray-700 mb-2">مقترحاتك أو رسالتك لتطوير الخدمة</label>
+                <textarea id="feedbackText" rows="4" placeholder="يسعدنا سماع رأيك..." class="w-full p-3 border-2 rounded-xl outline-none resize-none bg-gray-50 font-bold focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 transition"></textarea>
+            </div>
+
+            <button onclick="window.submitFeedback()" id="btnSubmitFeedback" class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white font-black py-4 rounded-xl shadow-lg transition transform hover:-translate-y-1 text-lg">
+                إرسال التقييم <i class="fa-solid fa-paper-plane ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="appContainer" class="hide h-full w-full flex flex-col md:flex-row opacity-0 transition-opacity duration-500">
+        
+        <header id="mobileHeader" class="md:hidden text-white p-4 shadow-md flex justify-center items-center z-10 shrink-0 transition-colors duration-300">
+            <div class="flex items-center gap-3">
+                <i id="mobileHeaderIcon" class="fa-solid fa-church text-2xl"></i>
+                <div class="text-center">
+                    <h1 id="appTitleMobile" class="text-sm font-black">اسم الصف</h1>
+                    <h2 class="text-[10px] text-gray-200 opacity-80">كنيسة مارجرجس بالسويس</h2>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto custom-scrollbar p-4 pb-32 md:p-8 w-full h-full bg-gray-50 relative z-0">
+            
+            <div id="tab-attendance" class="tab-content max-w-6xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-2xl font-black text-gray-800 flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
+                        <span class="bg-gray-100 text-gray-600 w-10 h-10 rounded-lg flex items-center justify-center shadow-inner dynamic-theme-text"><i class="fa-solid fa-list-check"></i></span>
+                        سجل الحضور - <span id="sectionTypeTitle"></span>
+                    </h2>
+                    
+                    <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                        <div class="flex items-center justify-center gap-2 bg-green-50 px-4 py-2 rounded-xl border border-green-200 w-full sm:w-auto shadow-sm">
+                            <i class="fa-solid fa-users text-green-600 text-xl"></i>
+                            <span class="text-sm font-bold text-green-800">إجمالي الحضور:</span>
+                            <span id="attendanceCountDisplay" class="text-xl font-black text-green-700 w-8 text-center bg-white rounded-md border border-green-200">0</span>
+                        </div>
+
+                        <div class="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-xl border w-full sm:w-auto justify-center">
+                            <label class="text-sm font-bold text-gray-500 whitespace-nowrap"><i class="fa-regular fa-calendar ml-1"></i> التاريخ:</label>
+                            <input type="date" id="meetingDate" class="border-none outline-none font-black bg-transparent cursor-pointer dynamic-theme-text">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-4 mb-6">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-search absolute right-5 top-4 text-gray-400 text-lg"></i>
+                        <input type="text" id="searchInput" placeholder="ابحث بالاسم أو الهاتف أو العنوان..." 
+                               class="w-full pr-14 pl-4 py-4 rounded-2xl border-2 border-gray-100 outline-none bg-white shadow-sm transition font-semibold focus:ring-4 dynamic-theme-border">
+                    </div>
+                    <button id="btnAddMakhdoom" class="text-white px-8 py-4 rounded-2xl font-black shadow-lg transition transform hover:-translate-y-1 flex items-center justify-center whitespace-nowrap text-lg dynamic-theme-btn">
+                        <i class="fa-solid fa-user-plus ml-2 text-xl"></i> <span id="btnAddText">إضافة مخدوم جديد</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button id="btnPresentWa" class="bg-white border-2 border-green-100 hover:border-green-400 text-green-600 hover:bg-green-50 p-4 rounded-2xl font-bold transition flex flex-col md:flex-row items-center justify-center gap-2 shadow-sm text-sm md:text-base">
+                        <i class="fa-brands fa-whatsapp text-2xl md:text-xl"></i> 
+                        <span class="text-center" id="lblPresentWa">مراسلة الحاضرين</span>
+                    </button>
+                    <button id="btnAbsentWa" class="bg-white border-2 border-red-100 hover:border-red-400 text-red-500 hover:bg-red-50 p-4 rounded-2xl font-bold transition flex flex-col md:flex-row items-center justify-center gap-2 shadow-sm text-sm md:text-base">
+                        <i class="fa-brands fa-whatsapp text-2xl md:text-xl"></i> 
+                        <span class="text-center" id="lblAbsentWa">مراسلة الغائبين</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-right min-w-[700px]">
+                            <thead class="bg-gray-50 text-gray-500 border-b-2">
+                                <tr>
+                                    <th class="py-4 px-6 font-bold w-24">حضر اليوم؟</th>
+                                    <th class="py-4 px-6 font-bold" id="thName">اسم المخدوم</th>
+                                    <th class="py-4 px-6 font-bold text-center">مرات الحضور</th>
+                                    <th class="py-4 px-6 font-bold">رقم الواتساب</th>
+                                    <th class="py-4 px-6 font-bold text-center">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="makhdoomsList" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                    <div id="emptyState" class="hide p-12 text-center">
+                        <div class="bg-gray-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-users-slash text-4xl text-gray-300"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-500 mb-2">القائمة فارغة!</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-birthdays" class="tab-content hide max-w-6xl mx-auto">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-pink-100 mb-6 flex items-center gap-4">
+                    <div class="bg-pink-50 w-14 h-14 rounded-2xl flex items-center justify-center text-pink-500">
+                        <i class="fa-solid fa-gift text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-800" id="lblBirthdayTitle">أعياد ميلاد المخدومين</h2>
+                        <p class="text-sm font-semibold text-gray-400">قائمة بأعياد ميلاد هذا الشهر</p>
+                    </div>
+                </div>
+                <div id="birthdayList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        // إعدادات قاعدة البيانات الخاصة بمشروعك
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxAvUTITjaUV9-rihQL4Nvbdp_AAuy0eM",
+            authDomain: "aftkad-mary-grges.firebaseapp.com",
+            databaseURL: "https://aftkad-mary-grges-default-rtdb.firebaseio.com",
+            projectId: "aftkad-mary-grges",
+            storageBucket: "aftkad-mary-grges.firebasestorage.app",
+            messagingSenderId: "654893324001",
+            appId: "1:654893324001:web:628c81c048b1376e6389a0"
+        };
+
+        // تهيئة Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // جعل المتغيرات متاحة عالمياً لتتوافق مع الـ HTML
+        window.db = db;
+
+        // تعريف الهياكل الأساسية للمراحل والصفوف كاملة بكلمة السر (222)
+        const stagesData = {
+            nursery: { 
+                title: "مرحلة حضانة", 
+                icon: "fa-baby", 
+                color: "kg", 
+                password: "222", 
+                subs: { 
+                    "kg1": "كيجي 1", 
+                    "kg2": "كيجي 2" 
+                } 
+            },
+            primary: { 
+                title: "مرحلة ابتدائي", 
+                icon: "fa-child", 
+                color: "primary", 
+                password: "222", 
+                subs: { 
+                    "p1": "الصف الأول الابتدائي", 
+                    "p2": "الصف الثاني الابتدائي", 
+                    "p3": "الصف الثالث الابتدائي",
+                    "p4": "الصف الرابع الابتدائي",
+                    "p5": "الصف الخامس الابتدائي",
+                    "p6": "الصف السادس الابتدائي"
+                } 
+            },
+            prep: { 
+                title: "مرحلة إعدادي", 
+                icon: "fa-user-graduate", 
+                color: "uni", 
+                password: "222", 
+                subs: { 
+                    "m1": "الصف الأول الإعدادي", 
+                    "m2": "الصف الثاني الإعدادي",
+                    "m3": "الصف الثالث الإعدادي"
+                } 
+            }
+        };
+
+        let currentStage = '';
+        let currentSubStage = '';
+        let currentTargetType = ''; // servants أو makhdooms
+
+        // ربط الأحداث وعناصر التحكم بعد تحميل الصفحة
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("meetingDate").value = new Date().toISOString().split('T')[0];
+            document.getElementById("meetingDate").addEventListener("change", renderAttendanceList);
+            document.getElementById("searchInput").addEventListener("keyup", renderAttendanceList);
+            document.getElementById("btnAddMakhdoom").addEventListener("click", () => openAddModal());
+            document.getElementById("btnPresentWa").addEventListener("click", () => openWhatsAppModal('present'));
+            document.getElementById("btnAbsentWa").addEventListener("click", () => openWhatsAppModal('absent'));
+        });
+
+        window.selectStage = function(stage) {
+            currentStage = stage;
+            const stepSelectStage = document.getElementById("stepSelectStage");
+            const stepSelectSubStage = document.getElementById("stepSelectSubStage");
+            const subStageTitle = document.getElementById("subStageTitle");
+            const subStageButtons = document.getElementById("subStageButtons");
+
+            stepSelectStage.classList.add("hide");
+            stepSelectSubStage.classList.remove("hide");
+            subStageTitle.innerText = `اختر صفوف ${stagesData[stage].title}`;
+            
+            subStageButtons.innerHTML = '';
+            Object.keys(stagesData[stage].subs).forEach(subKey => {
+                const btn = document.createElement("button");
+                btn.className = "p-4 bg-gray-50 border rounded-xl font-bold hover:bg-blue-50 transition text-sm";
+                btn.innerText = stagesData[stage].subs[subKey];
+                btn.onclick = () => selectSubStage(subKey);
+                subStageButtons.appendChild(btn);
+            });
+        };
+
+        window.backToStages = function() {
+            document.getElementById("stepSelectStage").classList.remove("hide");
+            document.getElementById("stepSelectSubStage").classList.add("hide");
+        };
+
+        function selectSubStage(sub) {
+            currentSubStage = sub;
+            document.getElementById("stepSelectSubStage").classList.add("hide");
+            document.getElementById("stepPassword").classList.remove("hide");
+            document.getElementById("loginMeetingTitle").innerText = stagesData[currentStage].subs[sub];
+        }
+
+        window.backToSelection = function() {
+            document.getElementById("stepPassword").classList.add("hide");
+            document.getElementById("stepSelectSubStage").classList.remove("hide");
+        };
+
+        window.checkPassword = function() {
+            const pass = document.getElementById("passwordInput").value;
+            if(pass === stagesData[currentStage].password) {
+                document.getElementById("stepPassword").classList.add("hide");
+                document.getElementById("stepSelectTargetType").classList.remove("hide");
+            } else {
+                Swal.fire('خطأ', 'الرقم السري غير صحيح', 'error');
+            }
+        };
+
+        window.backToPassword = function() {
+            document.getElementById("stepSelectTargetType").classList.add("hide");
+            document.getElementById("stepPassword").classList.remove("hide");
+        };
+
+        window.setTargetType = function(type) {
+            currentTargetType = type;
+            document.getElementById("loginScreen").classList.add("hide");
+            document.getElementById("appContainer").classList.remove("hide");
+            document.getElementById("appContainer").style.opacity = "1";
+            
+            const title = `${stagesData[currentStage].subs[currentSubStage]} - ${type === 'servants' ? 'الخدام' : 'المخدومين'}`;
+            document.getElementById("appTitleMobile").innerText = title;
+            document.getElementById("sectionTypeTitle").innerText = type === 'servants' ? 'الخدام' : 'المخدومين';
+            document.getElementById("btnAddText").innerText = type === 'servants' ? 'إضافة خادم جديد' : 'إضافة مخدوم جديد';
+            document.getElementById("thName").innerText = type === 'servants' ? 'اسم الخادم' : 'اسم المخدوم';
+            
+            renderAttendanceList();
+        };
+
+        async function renderAttendanceList() {
+            const listContainer = document.getElementById("makhdoomsList");
+            const emptyState = document.getElementById("emptyState");
+            listContainer.innerHTML = '';
+
+            const date = document.getElementById("meetingDate").value;
+            const search = document.getElementById("searchInput").value.toLowerCase();
+
+            try {
+                const snapshot = await get(child(ref(db), `data/${currentStage}/${currentSubStage}/${currentTargetType}`));
+                if (snapshot.exists()) {
+                    emptyState.classList.add("hide");
+                    let count = 0;
+                    const data = snapshot.val();
+
+                    Object.keys(data).forEach(id => {
+                        const person = data[id];
+                        if (search && !person.name.toLowerCase().includes(search) && !(person.phone && person.phone.includes(search))) return;
+
+                        const totalAttendance = person.attendance ? Object.keys(person.attendance).length : 0;
+                        const isPresent = person.attendance && person.attendance[date] ? true : false;
+                        if(isPresent) count++;
+
+                        const tr = document.createElement("tr");
+                        tr.className = "hover:bg-gray-50 font-semibold";
+                        tr.innerHTML = `
+                            <td class="py-4 px-6">
+                                <input type="checkbox" ${isPresent ? 'checked' : ''} onchange="window.toggleAttendance('${id}', '${date}', this.checked)" class="w-5 h-5 accent-primary">
+                            </td>
+                            <td class="py-4 px-6">${person.name}</td>
+                            <td class="py-4 px-6 text-center">${totalAttendance}</td>
+                            <td class="py-4 px-6">${person.phone || 'لا يوجد'}</td>
+                            <td class="py-4 px-6 text-center">
+                                <button onclick="window.deletePerson('${id}')" class="text-red-500 hover:text-red-700 mx-1"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        `;
+                        listContainer.appendChild(tr);
+                    });
+                    document.getElementById("attendanceCountDisplay").innerText = count;
+                } else {
+                    emptyState.classList.remove("hide");
+                    document.getElementById("attendanceCountDisplay").innerText = 0;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        window.toggleAttendance = async function(id, date, isChecked) {
+            const attendanceRef = ref(db, `data/${currentStage}/${currentSubStage}/${currentTargetType}/${id}/attendance/${date}`);
+            try {
+                if(isChecked) {
+                    await set(attendanceRef, true);
+                } else {
+                    await remove(attendanceRef);
+                }
+                renderAttendanceList();
+            } catch(error) {
+                Swal.fire('خطأ', 'حدثت مشكلة أثناء تحديث حالة الحضور', 'error');
+            }
+        };
+
+        async function openAddModal() {
+            const { value: formValues } = await Swal.fire({
+                title: currentTargetType === 'servants' ? 'إضافة خادم جديد' : 'إضافة مخدوم جديد',
+                html:
+                    '<input id="swal-name" class="swal2-input" placeholder="الاسم الكامل">' +
+                    '<input id="swal-phone" class="swal2-input" placeholder="رقم الواتساب">',
+                focusConfirm: false,
+                preConfirm: () => {
+                    return {
+                        name: document.getElementById('swal-name').value,
+                        phone: document.getElementById('swal-phone').value
+                    }
+                }
+            });
+
+            if (formValues && formValues.name) {
+                const newId = Date.now().toString();
+                try {
+                    await set(ref(db, `data/${currentStage}/${currentSubStage}/${currentTargetType}/${newId}`), {
+                        name: formValues.name,
+                        phone: formValues.phone,
+                        id: newId
+                    });
+                    Swal.fire('تم', 'تمت الإضافة بنجاح', 'success');
+                    renderAttendanceList();
+                } catch (error) {
+                    Swal.fire('خطأ', 'فشلت عملية الإضافة', 'error');
+                }
+            }
+        }
+
+        window.deletePerson = async function(id) {
+            const result = await Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: "لن تتمكن من استعادة البيانات المقترنة بهذا الحساب!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    await remove(ref(db, `data/${currentStage}/${currentSubStage}/${currentTargetType}/${id}`));
+                    Swal.fire('تم الحذف!', 'تمت إزالة الحساب بنجاح.', 'success');
+                    renderAttendanceList();
+                } catch (error) {
+                    Swal.fire('خطأ', 'لم نتمكن من إتمام عملية الحذف', 'error');
+                }
+            }
+        };
+
+        window.openWhatsAppModal = async function(type) {
+            const date = document.getElementById("meetingDate").value;
+            try {
+                const snapshot = await get(child(ref(db), `data/${currentStage}/${currentSubStage}/${currentTargetType}`));
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    let list = [];
+                    Object.keys(data).forEach(id => {
+                        const person = data[id];
+                        const isPresent = person.attendance && person.attendance[date] ? true : false;
+                        if(type === 'present' && isPresent && person.phone) list.push(person);
+                        if(type === 'absent' && !isPresent && person.phone) list.push(person);
+                    });
+
+                    if(list.length === 0) {
+                        Swal.fire('تنبيه', 'لا توجد أرقام هواتف مسجلة لهذه الفئة اليوم', 'info');
+                        return;
+                    }
+
+                    const { value: text } = await Swal.fire({
+                        input: 'textarea',
+                        inputLabel: 'رسالة الواتساب الموحدة',
+                        inputPlaceholder: 'اكتب رسالتك هنا...',
+                        showCancelButton: true
+                    });
+
+                    if (text) {
+                        list.forEach(p => {
+                            let cleanPhone = p.phone.trim();
+                            if(cleanPhone.startsWith('01')) cleanPhone = '2' + cleanPhone;
+                            const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+                            window.open(url, '_blank');
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+    </script>
+</body>
+</html>
